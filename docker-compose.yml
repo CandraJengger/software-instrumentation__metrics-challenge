@@ -21,6 +21,31 @@ services:
       - "--storage.tsdb.retention.time=5m"
       - "--storage.tsdb.retention.size=10GB"
 
+  my-postgres:
+    image: postgres
+    command: postgres -c 'max_connections=1000'
+    environment:
+      POSTGRES_DB: db_course
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - postgres:/var/lib/postgresql/data/
+
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter
+    ports:
+      - "9187:9187"
+    environment:
+      DATA_SOURCE_URI: "my-postgres:5432/postgres?sslmode=disable"
+      DATA_SOURCE_USER: postgres
+      DATA_SOURCE_PASS: postgres
+    depends_on:
+      - my-postgres
+
 volumes:
   grafana_data:
   prometheus_data:
+  postgres:
