@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog/log"
 )
 
@@ -25,6 +26,9 @@ func main() {
 	}()
 
 	r := mux.NewRouter()
+
+	r.Handle("/metrics", promhttp.Handler())
+
 	r.HandleFunc("/", handler)
 
 	// start: set up any of your logger configuration here if necessary
